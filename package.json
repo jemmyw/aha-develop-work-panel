@@ -1,0 +1,36 @@
+{
+  "name": "kealabs.work-panel",
+  "description": "Work Panel",
+  "version": "0.0.0",
+  "author": "kealabs",
+  "repository": {
+    "type": "git",
+    "url": "TODO: Add the GitHub URL to your extension in package.json"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/color": "^3.0.2",
+    "@types/react": "^17.0.14",
+    "aha-cli": "1.10.0"
+  },
+  "ahaExtension": {
+    "contributes": {
+      "views": {
+        "workPanel": {
+          "title": "Work",
+          "entryPoint": "src/views/workPanel.tsx",
+          "host": "panel",
+          "recordTypes": [
+            "Feature"
+          ]
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "@aha-app/aha-develop-react": "^1.0.6",
+    "color": "^4.0.0",
+    "gql-tag": "^1.0.1",
+    "recoil": "^0.3.1"
+  }
+}
