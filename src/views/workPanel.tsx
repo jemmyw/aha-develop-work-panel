@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { RecoilRoot } from "recoil";
+import {
+  RecoilRoot,
+  useRecoilCallback,
+  useRecoilState,
+  useRecoilValueLoadable,
+} from "recoil";
 import { IDENTIFER } from "../identifier";
+import { authStateSelector, forceAuthState } from "../store/github";
+import { loadBookmark } from "../store/helpers/loadBookmark";
+import { recordsState } from "../store/records";
 import { Styles } from "./Styles";
 import { WorkflowStatus } from "./WorkflowStatus";
 
@@ -12,50 +20,27 @@ interface Props {
 }
 
 const MyWork: React.FC<Props> = ({ workflowBoardId, visibleStatuses }) => {
+  const githubAuthState = useRecoilValueLoadable(authStateSelector);
   const [bookmark, setBookmark] = useState<Aha.BookmarksWorkflowBoard | null>(
     null
   );
   const [workflow, setWorkflow] = useState<Aha.Workflow | null>(null);
-  const [records, setRecords] = useState<Aha.RecordUnion[]>([]);
+  const [records, setRecords] = useRecoilState(recordsState);
+
+  const authorizeGithub = useRecoilCallback(
+    ({ set }) =>
+      () =>
+        set(forceAuthState, true)
+  );
 
   useEffect(() => {
-    async function loadBookmark(id: string) {
-      const scopes = (
-        aha.models.BookmarksWorkflowBoard as any
-      ).OBJECT_CLASSES.map((objectClass: any) =>
-        (aha.models.BookmarksWorkflowBoard as any).buildRecordScope(objectClass)
-      ).reduce((acc: Aha.Query<any, any>, scope: Aha.Query<any, any>) =>
-        acc.union(scope)
-      ) as Aha.Query<any, any>;
+    if (!workflowBoardId) return;
 
-      const bookmarkScope = aha.models.BookmarksWorkflowBoard.select(
-        "id",
-        "projectId",
-        "workflowId",
-        "view",
-        "filters"
-      ).merge({
-        iteration: ["id", "name"],
-        records: scopes,
-      });
-
-      const bookmark = await bookmarkScope.find(id);
-
-      const workflow = await aha.models.Workflow.select("id", "name")
-        .merge({ workflowStatuses: ["id", "name", "color", "position"] })
-        .find(bookmark.workflowId);
-
+    loadBookmark(workflowBoardId).then(({ workflow, bookmark, records }) => {
       setWorkflow(workflow);
       setBookmark(bookmark);
-
-      const records = bookmark.records.filter(
-        (record) => record.assignedToUser.id === window.currentUser.id
-      );
       setRecords(records);
-    }
-
-    if (!workflowBoardId) return;
-    loadBookmark(workflowBoardId);
+    });
   }, [workflowBoardId]);
 
   if (!workflowBoardId) return <div>Edit the panel settings first</div>;
@@ -81,13 +66,20 @@ const MyWork: React.FC<Props> = ({ workflowBoardId, visibleStatuses }) => {
   }, [] as JSX.Element[]);
 
   return (
-    <div>
-      <div className="workflow-statuses">
-        <aha-flex direction="column">
-          {statuses}
-        </aha-flex>
+    <>
+      <div className="my-work">
+        <div className="workflow-statuses">
+          <aha-flex direction="column">{statuses}</aha-flex>
+        </div>
       </div>
-    </div>
+      {githubAuthState.contents === "unknown" && (
+        <div className="github-auth">
+          <aha-button type="primary" onClick={authorizeGithub}>
+            Authorize GitHub
+          </aha-button>
+        </div>
+      )}
+    </>
   );
 };
 
@@ -101,10 +93,12 @@ panel.on("render", ({ props: { panel } }) => {
     <>
       <Styles />
       <RecoilRoot>
-        <MyWork
-          workflowBoardId={String(panel.settings.workflowBoardId)}
-          visibleStatuses={visibleStatuses}
-        />
+        <React.Suspense fallback={<aha-spinner />}>
+          <MyWork
+            workflowBoardId={String(panel.settings.workflowBoardId)}
+            visibleStatuses={visibleStatuses}
+          />
+        </React.Suspense>
       </RecoilRoot>
     </>
   );

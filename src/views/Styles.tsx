@@ -39,24 +39,64 @@ export const Styles = () => {
 
         .record .info {
           display: flex;
+          align-items: "center";
           color: var(--aha-gray-800);
+          background-color: var(--aha-gray-200);
+          border-top: 1px solid var(--aha-gray-400);
+          border-bottom: 1px solid white;
           font-size: 10px;
         }
 
         .record .info aha-icon {
           font-size: 11px;
-          margin-right: 3px;
         }
 
-        .record .info > div {
-          border-right: 1px solid var(--aha-gray-200);
+        .i-p {
+          display: flex;
+          align-items: center;
+          border: 1px solid rgba(0, 0, 0, 0);
+          border-left: 1px solid white;
+          padding: 1px 2px 0 2px;
         }
 
-        .record .commentCount {
+        .i-p.commentCount {
           color: var(--aha-gray-400);
         }
-        .record .commentCount.hasComments {
+        .i-p.commentCount aha-icon {
+          margin-right: 3px;
+        }
+        .i-p.commentCount.hasComments {
           color: var(--aha-gray-800);
+        }
+
+        .i-p.pr-s {
+          border: 1px solid black;
+          border-radius: 2px;
+        }
+        .i-p.pr-s.open {
+          color: #4f8f0e;
+          border-color: #4f8f0e;
+          background-color: #e5f3d6;
+        }
+        .i-p.pr-s.merged {
+          color: #463159;
+          border-color: #463159;
+          background-color: #e5dced;
+        }
+        .i-p.pr-s.closed {
+          color: #992e0b;
+          border-color: #992e0b;
+          background-color: #fae7e1;
+        }
+        .i-p.pr-s.draft {
+          color: #0b0b0b;
+          background-color: #b8c0c9;
+        }
+
+        .github-auth {
+          position: absolute;
+          bottom: 0px;
+          right: 0px;
         }
       `}
     </style>

@@ -1,4 +1,5 @@
 import React from "react";
+import { GithubInfo } from "./github/GithubInfo";
 
 export const Record: React.FC<{
   workflowStatus: Aha.WorkflowStatus;
@@ -20,12 +21,14 @@ export const Record: React.FC<{
       <div className="info">
         <div
           className={
-            "commentCount" + (record.commentsCount > 0 ? " hasComments" : "")
+            "i-p commentCount" +
+            (record.commentsCount > 0 ? " hasComments" : "")
           }
         >
           <aha-icon icon="fa fa-comment" />
-          {record.commentsCount > 0 && record.commentsCount}
+          {record.commentsCount}
         </div>
+        <GithubInfo fields={record.extensionFields} />
       </div>
     </div>
   );
