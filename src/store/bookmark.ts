@@ -17,6 +17,7 @@ export const bookmarkSelector = selector({
       (aha.models.BookmarksWorkflowBoard as any)
         .buildRecordScope(objectClass)
         .merge({
+          originalEstimate: ["text"],
           extensionFields: aha.models.ExtensionField.select(
             "name",
             "value"

@@ -25,7 +25,7 @@ export const Styles = () => {
 
         .record .ref {
           font-size: 11px;
-          padding: 4px 6px;
+          padding: 4px 6px 0 6px;;
         }
 
         .record .name {
@@ -56,7 +56,8 @@ export const Styles = () => {
           align-items: center;
           border: 1px solid rgba(0, 0, 0, 0);
           border-left: 1px solid white;
-          padding: 1px 2px 0 2px;
+          border-right: 1px solid var(--aha-gray-400);
+          padding: 1px 3px 0 3px;
         }
 
         .i-p.commentCount {

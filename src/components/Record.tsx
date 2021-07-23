@@ -25,9 +25,15 @@ export const Record: React.FC<{
             (record.commentsCount > 0 ? " hasComments" : "")
           }
         >
-          <aha-icon icon="fa fa-comment" />
+          <aha-icon icon="fa-regular fa-comment" />
           {record.commentsCount}
         </div>
+        {record.originalEstimate?.text && (
+          <div className="i-p estimate">
+            <aha-icon icon="fa-regular fa-clock" />
+            {record.originalEstimate.text}
+          </div>
+        )}
         <GithubInfo fields={record.extensionFields} />
       </div>
     </div>
