@@ -1,8 +1,8 @@
 import { Octokit } from "@octokit/rest";
+import gql from "gql-tag";
 import { atom, noWait, selector, selectorFamily } from "recoil";
 import { PrInfo } from "../PrInfo";
-import { recordsState } from "./records";
-import gql from "gql-tag";
+import { recordsSelector } from "./records";
 
 type AuthState = "unknown" | "error" | "authing" | "authed";
 
@@ -91,7 +91,7 @@ export const githubPullRequestsSelector = selector({
     const authToken = get(authTokenSelector);
     if (authToken === "") return {};
 
-    const records = get(recordsState);
+    const records = get(recordsSelector);
     if (records.length === 0) return {};
 
     const api = new Octokit({ auth: authToken });

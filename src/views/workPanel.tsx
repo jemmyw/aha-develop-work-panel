@@ -1,14 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
   RecoilRoot,
-  useRecoilCallback,
-  useRecoilState,
+  useRecoilCallback, useRecoilValue,
   useRecoilValueLoadable,
+  useSetRecoilState
 } from "recoil";
 import { IDENTIFER } from "../identifier";
+import {
+  bookmarkSelector,
+  workflowBoardIdState,
+  workflowSelector
+} from "../store/bookmark";
 import { authStateSelector, forceAuthState } from "../store/github";
-import { loadBookmark } from "../store/helpers/loadBookmark";
-import { recordsState } from "../store/records";
+import { recordsSelector } from "../store/records";
 import { Styles } from "./Styles";
 import { WorkflowStatus } from "./WorkflowStatus";
 
@@ -21,11 +25,10 @@ interface Props {
 
 const MyWork: React.FC<Props> = ({ workflowBoardId, visibleStatuses }) => {
   const githubAuthState = useRecoilValueLoadable(authStateSelector);
-  const [bookmark, setBookmark] = useState<Aha.BookmarksWorkflowBoard | null>(
-    null
-  );
-  const [workflow, setWorkflow] = useState<Aha.Workflow | null>(null);
-  const [records, setRecords] = useRecoilState(recordsState);
+  const setWorkflowBoardId = useSetRecoilState(workflowBoardIdState);
+  const bookmark = useRecoilValue(bookmarkSelector);
+  const workflow = useRecoilValue(workflowSelector);
+  const records = useRecoilValue(recordsSelector);
 
   const authorizeGithub = useRecoilCallback(
     ({ set }) =>
@@ -34,13 +37,7 @@ const MyWork: React.FC<Props> = ({ workflowBoardId, visibleStatuses }) => {
   );
 
   useEffect(() => {
-    if (!workflowBoardId) return;
-
-    loadBookmark(workflowBoardId).then(({ workflow, bookmark, records }) => {
-      setWorkflow(workflow);
-      setBookmark(bookmark);
-      setRecords(records);
-    });
+    setWorkflowBoardId(workflowBoardId);
   }, [workflowBoardId]);
 
   if (!workflowBoardId) return <div>Edit the panel settings first</div>;
