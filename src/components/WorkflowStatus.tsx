@@ -1,6 +1,6 @@
 import Color from "color";
 import React from "react";
-import { Record } from "../components/Record";
+import { Record } from "./Record";
 
 interface Props {
   workflowStatus: Aha.WorkflowStatus;

@@ -11,6 +11,7 @@
   "devDependencies": {
     "@types/color": "^3.0.2",
     "@types/react": "^17.0.14",
+    "@types/uuid": "^8.3.1",
     "aha-cli": "1.10.0"
   },
   "ahaExtension": {
@@ -37,6 +38,7 @@
     "@octokit/rest": "^18.7.0",
     "color": "^4.0.0",
     "gql-tag": "^1.0.1",
-    "recoil": "^0.3.1"
+    "recoil": "^0.3.1",
+    "uuid": "^8.3.2"
   }
 }

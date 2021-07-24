@@ -1,20 +1,23 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   RecoilRoot,
-  useRecoilCallback, useRecoilValue,
+  useRecoilCallback,
   useRecoilValueLoadable,
-  useSetRecoilState
+  useSetRecoilState,
 } from "recoil";
+import { WorkflowStatus } from "../components/WorkflowStatus";
 import { IDENTIFER } from "../identifier";
+import { useReactiveRegister } from "../lib/useReactiveRegister";
+import { useRecoilCachedLoadable } from "../lib/useRecoilCachedLoadable";
 import {
   bookmarkSelector,
+  reactiveReloadId,
   workflowBoardIdState,
-  workflowSelector
+  workflowSelector,
 } from "../store/bookmark";
 import { authStateSelector, forceAuthState } from "../store/github";
 import { recordsSelector } from "../store/records";
 import { Styles } from "./Styles";
-import { WorkflowStatus } from "./WorkflowStatus";
 
 const panel = aha.getPanel(IDENTIFER, "workPanel", { name: "My Work" });
 
@@ -26,14 +29,30 @@ interface Props {
 const MyWork: React.FC<Props> = ({ workflowBoardId, visibleStatuses }) => {
   const githubAuthState = useRecoilValueLoadable(authStateSelector);
   const setWorkflowBoardId = useSetRecoilState(workflowBoardIdState);
-  const bookmark = useRecoilValue(bookmarkSelector);
-  const workflow = useRecoilValue(workflowSelector);
-  const records = useRecoilValue(recordsSelector);
+  const [bookmark] = useRecoilCachedLoadable(bookmarkSelector, null);
+  const [workflow] = useRecoilCachedLoadable(workflowSelector, null);
+  const [records] = useRecoilCachedLoadable(recordsSelector, []);
 
   const authorizeGithub = useRecoilCallback(
     ({ set }) =>
       () =>
         set(forceAuthState, true)
+  );
+
+  const incrementReload = useRecoilCallback(({ set }) => () => {
+    set(reactiveReloadId, (id) => id + 1);
+  });
+
+  const reactiveReloadTimer = useRef<NodeJS.Timeout>();
+  useReactiveRegister(
+    records.map(({ id, typename }) => `${typename}-${id}`),
+    () => {
+      if (reactiveReloadTimer.current) return;
+      reactiveReloadTimer.current = setTimeout(() => {
+        incrementReload();
+        reactiveReloadTimer.current = undefined;
+      }, 250);
+    }
   );
 
   useEffect(() => {

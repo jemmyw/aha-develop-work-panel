@@ -5,11 +5,19 @@ export const workflowBoardIdState = atom<string | null>({
   default: null,
 });
 
+export const reactiveReloadId = atom<number>({
+  key: "reactiveReloadId",
+  default: 0,
+});
+
 export const bookmarkSelector = selector({
   key: "bookmark",
   get: async ({ get }) => {
     const id = get(workflowBoardIdState);
     if (!id) return null;
+
+    // Trigger when the reactive reload id changes
+    get(reactiveReloadId);
 
     const scopes = (
       aha.models.BookmarksWorkflowBoard as any
