@@ -61,9 +61,9 @@ export const Styles = () => {
         }
 
         .i-p.commentCount {
-          color: var(--aha-gray-400);
+          color: var(--aha-gray-600);
         }
-        .i-p.commentCount aha-icon {
+        .i-p.commentCount aha-icon, .i-p.estimate aha-icon {
           margin-right: 3px;
         }
         .i-p.commentCount.hasComments {

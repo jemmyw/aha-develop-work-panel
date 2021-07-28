@@ -10,14 +10,23 @@ export const reactiveReloadId = atom<number>({
   default: 0,
 });
 
+export const projectSelector = selector({
+  key: "project",
+  get: async ({ get }) => {
+    return await aha.models.Project.select("id", "name", "isTeam").find(
+      // @ts-ignore
+      window.currentProject.id
+    );
+  },
+});
+
 export const bookmarkSelector = selector({
   key: "bookmark",
   get: async ({ get }) => {
-    const id = get(workflowBoardIdState);
-    if (!id) return null;
-
     // Trigger when the reactive reload id changes
     get(reactiveReloadId);
+    const project = get(projectSelector);
+    if (!project?.isTeam) return null;
 
     const scopes = (
       aha.models.BookmarksWorkflowBoard as any
@@ -48,7 +57,14 @@ export const bookmarkSelector = selector({
       records: scopes,
     });
 
-    return await bookmarkScope.find(id);
+    const bookmarkProject = await aha.models.Project.select("id", "name")
+      .merge({ workflowBoardBookmark: bookmarkScope })
+      .find(project.id);
+
+    const bookmark = new aha.models.BookmarksWorkflowBoard(
+      bookmarkProject.attributes.workflowBoardBookmark
+    );
+    return bookmark;
   },
 });
 

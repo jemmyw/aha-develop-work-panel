@@ -11,6 +11,7 @@ import { useReactiveRegister } from "../lib/useReactiveRegister";
 import { useRecoilCachedLoadable } from "../lib/useRecoilCachedLoadable";
 import {
   bookmarkSelector,
+  projectSelector,
   reactiveReloadId,
   workflowBoardIdState,
   workflowSelector,
@@ -26,9 +27,24 @@ interface Props {
   visibleStatuses: string[];
 }
 
+const Spinner: React.FC<{}> = () => {
+  return (
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        width: "100%",
+      }}
+    >
+      <aha-spinner size="48px" />
+    </div>
+  );
+};
+
 const MyWork: React.FC<Props> = ({ workflowBoardId, visibleStatuses }) => {
   const githubAuthState = useRecoilValueLoadable(authStateSelector);
-  const setWorkflowBoardId = useSetRecoilState(workflowBoardIdState);
+  const [project] = useRecoilCachedLoadable(projectSelector, null);
   const [bookmark] = useRecoilCachedLoadable(bookmarkSelector, null);
   const [workflow] = useRecoilCachedLoadable(workflowSelector, null);
   const [records] = useRecoilCachedLoadable(recordsSelector, []);
@@ -55,12 +71,11 @@ const MyWork: React.FC<Props> = ({ workflowBoardId, visibleStatuses }) => {
     }
   );
 
-  useEffect(() => {
-    setWorkflowBoardId(workflowBoardId);
-  }, [workflowBoardId]);
-
-  if (!workflowBoardId) return <div>Edit the panel settings first</div>;
-  if (!bookmark || !workflow) return <aha-spinner />;
+  if (!project) return <Spinner />;
+  if (!project.isTeam) {
+    return <div>Select a team first</div>;
+  }
+  if (!bookmark || !workflow) return <Spinner />;
 
   const statuses = workflow.workflowStatuses.reduce((acc, status) => {
     if (visibleStatuses.length > 0 && !visibleStatuses.includes(status.name))
@@ -109,7 +124,7 @@ panel.on("render", ({ props: { panel } }) => {
     <>
       <Styles />
       <RecoilRoot>
-        <React.Suspense fallback={<aha-spinner />}>
+        <React.Suspense fallback={<Spinner />}>
           <MyWork
             workflowBoardId={String(panel.settings.workflowBoardId)}
             visibleStatuses={visibleStatuses}
@@ -122,11 +137,6 @@ panel.on("render", ({ props: { panel } }) => {
 
 panel.on({ action: "settings" }, () => {
   return [
-    {
-      key: "workflowBoardId",
-      type: "Text",
-      title: "Workflow board ID",
-    },
     {
       key: "visibleStatuses",
       type: "Text",
