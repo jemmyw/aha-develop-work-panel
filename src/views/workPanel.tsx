@@ -17,7 +17,6 @@ import { Styles } from "./Styles";
 const panel = aha.getPanel(IDENTIFER, "workPanel", { name: "My Work" });
 
 interface Props {
-  workflowBoardId: string;
   visibleStatuses: string[];
 }
 
@@ -37,7 +36,7 @@ const Spinner: React.FC<{}> = () => {
   );
 };
 
-const MyWork: React.FC<Props> = ({ workflowBoardId, visibleStatuses }) => {
+const MyWork: React.FC<Props> = ({ visibleStatuses }) => {
   const githubAuthState = useRecoilValueLoadable(authStateSelector);
   const [project] = useRecoilCachedLoadable(projectSelector, null);
   const [bookmark] = useRecoilCachedLoadable(bookmarkSelector, null);
@@ -73,6 +72,7 @@ const MyWork: React.FC<Props> = ({ workflowBoardId, visibleStatuses }) => {
   if (!bookmark || !workflow) return <Spinner />;
 
   const statuses = workflow.workflowStatuses.reduce((acc, status) => {
+    console.log({ visibleStatuses });
     if (visibleStatuses.length > 0 && !visibleStatuses.includes(status.name))
       return acc;
 
@@ -110,7 +110,7 @@ const MyWork: React.FC<Props> = ({ workflowBoardId, visibleStatuses }) => {
 };
 
 panel.on("render", ({ props: { panel } }) => {
-  const visibleStatuses = String(panel.settings.visibleStatuses)
+  const visibleStatuses = String(panel.settings.visibleStatuses || "")
     .split(",")
     .map((s) => s.trim())
     .filter((s) => s.length > 0);
@@ -120,10 +120,7 @@ panel.on("render", ({ props: { panel } }) => {
       <Styles />
       <RecoilRoot>
         <React.Suspense fallback={<Spinner />}>
-          <MyWork
-            workflowBoardId={String(panel.settings.workflowBoardId)}
-            visibleStatuses={visibleStatuses}
-          />
+          <MyWork visibleStatuses={visibleStatuses} />
         </React.Suspense>
       </RecoilRoot>
     </>

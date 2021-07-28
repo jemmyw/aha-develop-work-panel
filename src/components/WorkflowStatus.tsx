@@ -13,6 +13,7 @@ export const WorkflowStatus: React.FC<Props> = ({
 }) => {
   const color = Color(workflowStatus.color);
   const fore = color.isDark() ? "#fff" : "#000";
+  const back = color.mix(Color.rgb(255, 255, 255), 0.6);
 
   const recordElements = records.map((record) => (
     <Record workflowStatus={workflowStatus} record={record} key={record.id} />
@@ -21,12 +22,13 @@ export const WorkflowStatus: React.FC<Props> = ({
   return (
     <div className="workflow-status">
       <div
-        className="name"
+        className="title"
         style={{ backgroundColor: color.hex(), color: fore }}
       >
-        {workflowStatus.name}
+        <span className="name">{workflowStatus.name}</span>
+        <span className="record-count">{records.length}</span>
       </div>
-      <div className="records">
+      <div className="record-list" style={{ backgroundColor: back.hex() }}>
         <aha-flex direction="column">{recordElements}</aha-flex>
       </div>
     </div>

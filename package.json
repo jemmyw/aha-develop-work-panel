@@ -2,13 +2,11 @@
   "name": "kealabs.work-panel",
   "description": "Work Panel",
   "version": "1.0.0",
-  "author": {
-    "name": "Jeremy Wells",
-    "email": "jeremy@kealabs.co.nz"
-  },
+  "author": "Jeremy Wells",
+  "homepage": "https://github.com/jemmyw/aha-develop-work-panel",
   "repository": {
     "type": "git",
-    "url": "TODO: Add the GitHub URL to your extension in package.json"
+    "url": "https://github.com/jemmyw/aha-develop-work-panel.git"
   },
   "license": "MIT",
   "devDependencies": {

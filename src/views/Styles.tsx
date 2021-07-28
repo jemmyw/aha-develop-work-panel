@@ -18,14 +18,29 @@ export const Styles = () => {
   return (
     <style>
       {css`
-        .workflow-status > .name {
+        .workflow-status > .title {
           padding: 3px 8px;
           font-size: 14px;
+          display: flex;
+          justify-content: space-between;
+        }
+
+        .workflow-status > .title .name {
+          font-size: 14px;
+        }
+
+        .workflow-status > .title .record-count {
+          font-size: 12px;
+        }
+
+        .record-list {
+          background-color: var(--aha-gray-200);
+          padding-left: 5px;
         }
 
         .record .ref {
           font-size: 11px;
-          padding: 4px 6px 0 6px;;
+          padding: 4px 6px 0 6px;
         }
 
         .record .name {
@@ -33,6 +48,7 @@ export const Styles = () => {
         }
 
         .record {
+          background-color: white;
           padding: 0;
           border-bottom: 1px solid var(--aha-gray-400);
         }
@@ -63,7 +79,8 @@ export const Styles = () => {
         .i-p.commentCount {
           color: var(--aha-gray-600);
         }
-        .i-p.commentCount aha-icon, .i-p.estimate aha-icon {
+        .i-p.commentCount aha-icon,
+        .i-p.estimate aha-icon {
           margin-right: 3px;
         }
         .i-p.commentCount.hasComments {

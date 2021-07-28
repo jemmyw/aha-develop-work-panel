@@ -7,7 +7,11 @@ import { ReviewDecision } from "./ReviewDecision";
 import { StatusCheck } from "./StatusCheck";
 
 const PrState: React.FC<{ state: PrInfo["state"] }> = ({ state }) => {
-  return <div className={"i-p pr-s " + state.toLowerCase()}>{state}</div>;
+  return (
+    <div className={"i-p pr-s " + state.toLowerCase()}>
+      {state.toUpperCase()}
+    </div>
+  );
 };
 
 const PullRequestInfo: React.FC<{ prInfo: PrInfo }> = ({ prInfo }) => {
