@@ -1,8 +1,11 @@
 {
   "name": "kealabs.work-panel",
   "description": "Work Panel",
-  "version": "0.0.0",
-  "author": "kealabs",
+  "version": "1.0.0",
+  "author": {
+    "name": "Jeremy Wells",
+    "email": "jeremy@kealabs.co.nz"
+  },
   "repository": {
     "type": "git",
     "url": "TODO: Add the GitHub URL to your extension in package.json"

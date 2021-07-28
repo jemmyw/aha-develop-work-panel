@@ -1,10 +1,5 @@
 import { atom, selector } from "recoil";
 
-export const workflowBoardIdState = atom<string | null>({
-  key: "workflowBoardId",
-  default: null,
-});
-
 export const reactiveReloadId = atom<number>({
   key: "reactiveReloadId",
   default: 0,
@@ -55,6 +50,9 @@ export const bookmarkSelector = selector({
     ).merge({
       iteration: ["id", "name"],
       records: scopes,
+      workflow: aha.models.Workflow.select("id", "name").merge({
+        workflowStatuses: ["id", "name", "color", "position"],
+      }),
     });
 
     const bookmarkProject = await aha.models.Project.select("id", "name")
@@ -63,7 +61,7 @@ export const bookmarkSelector = selector({
 
     const bookmark = new aha.models.BookmarksWorkflowBoard(
       bookmarkProject.attributes.workflowBoardBookmark
-    );
+    ) as Aha.BookmarksWorkflowBoard;
     return bookmark;
   },
 });
@@ -73,9 +71,8 @@ export const workflowSelector = selector({
   get: async ({ get }) => {
     const bookmark = get(bookmarkSelector);
     if (!bookmark) return null;
-
-    return await aha.models.Workflow.select("id", "name")
-      .merge({ workflowStatuses: ["id", "name", "color", "position"] })
-      .find(bookmark.workflowId);
+    return new aha.models.Workflow(
+      bookmark.attributes.workflow
+    ) as Aha.Workflow;
   },
 });

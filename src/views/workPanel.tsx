@@ -1,10 +1,5 @@
-import React, { useEffect, useRef } from "react";
-import {
-  RecoilRoot,
-  useRecoilCallback,
-  useRecoilValueLoadable,
-  useSetRecoilState,
-} from "recoil";
+import React, { useRef } from "react";
+import { RecoilRoot, useRecoilCallback, useRecoilValueLoadable } from "recoil";
 import { WorkflowStatus } from "../components/WorkflowStatus";
 import { IDENTIFER } from "../identifier";
 import { useReactiveRegister } from "../lib/useReactiveRegister";
@@ -13,7 +8,6 @@ import {
   bookmarkSelector,
   projectSelector,
   reactiveReloadId,
-  workflowBoardIdState,
   workflowSelector,
 } from "../store/bookmark";
 import { authStateSelector, forceAuthState } from "../store/github";
@@ -35,6 +29,7 @@ const Spinner: React.FC<{}> = () => {
         justifyContent: "center",
         alignItems: "center",
         width: "100%",
+        height: "100px",
       }}
     >
       <aha-spinner size="48px" />
