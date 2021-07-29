@@ -174,7 +174,8 @@ export interface GetPRPullRequest {
     | "REVIEW_REQUIRED"
     | "APPROVED"
     | "CHANGES_REQUESTED"
-    | "COMMENTED";
+    | "COMMENTED"
+    | null;
   commits: Commits;
 }
 

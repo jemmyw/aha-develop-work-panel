@@ -15,7 +15,10 @@ const PrState: React.FC<{ state: PrInfo["state"] }> = ({ state }) => {
 };
 
 const PullRequestInfo: React.FC<{ prInfo: PrInfo }> = ({ prInfo }) => {
-  const [fullPrInfo, state] = useRecoilCachedLoadable(githubPullRequestSelector(prInfo.url), null);
+  const [fullPrInfo, state] = useRecoilCachedLoadable(
+    githubPullRequestSelector(prInfo.url),
+    null
+  );
 
   if (!fullPrInfo) {
     return (
@@ -41,7 +44,9 @@ const PullRequestInfo: React.FC<{ prInfo: PrInfo }> = ({ prInfo }) => {
       </div>
       <PrState state={fullPrInfo.state} />
       {check && <StatusCheck check={check} />}
-      <ReviewDecision reviewDecision={fullPrInfo.reviewDecision} />
+      {fullPrInfo.reviewDecision && (
+        <ReviewDecision reviewDecision={fullPrInfo.reviewDecision} />
+      )}
     </>
   );
 };
