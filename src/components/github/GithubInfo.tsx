@@ -1,5 +1,5 @@
 import React from "react";
-import { useRecoilValueLoadable } from "recoil";
+import { useRecoilCachedLoadable } from "../../lib/useRecoilCachedLoadable";
 import { PrInfo } from "../../PrInfo";
 import { githubPullRequestSelector } from "../../store/github";
 import { mapStatusCheck } from "../../store/helpers/mapStatusCheck";
@@ -15,11 +15,9 @@ const PrState: React.FC<{ state: PrInfo["state"] }> = ({ state }) => {
 };
 
 const PullRequestInfo: React.FC<{ prInfo: PrInfo }> = ({ prInfo }) => {
-  const fullPrInfoLoadable = useRecoilValueLoadable(
-    githubPullRequestSelector(prInfo.url)
-  );
+  const [fullPrInfo, state] = useRecoilCachedLoadable(githubPullRequestSelector(prInfo.url), null);
 
-  if (fullPrInfoLoadable.state !== "hasValue") {
+  if (!fullPrInfo) {
     return (
       <>
         <div className={"i-p pr-n " + prInfo.state.toLowerCase()}>
@@ -32,7 +30,6 @@ const PullRequestInfo: React.FC<{ prInfo: PrInfo }> = ({ prInfo }) => {
     );
   }
 
-  const fullPrInfo = fullPrInfoLoadable.valueMaybe();
   const check = mapStatusCheck(fullPrInfo);
 
   return (

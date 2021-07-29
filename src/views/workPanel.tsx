@@ -1,5 +1,11 @@
 import React, { useRef } from "react";
-import { RecoilRoot, useRecoilCallback, useRecoilValueLoadable } from "recoil";
+import {
+  RecoilRoot,
+  useRecoilCallback,
+  useRecoilValue,
+  useRecoilValueLoadable,
+} from "recoil";
+import { Spinner } from "../components/Spinner";
 import { WorkflowStatus } from "../components/WorkflowStatus";
 import { IDENTIFER } from "../identifier";
 import { useReactiveRegister } from "../lib/useReactiveRegister";
@@ -11,8 +17,9 @@ import {
   workflowSelector,
 } from "../store/bookmark";
 import { authStateSelector, forceAuthState } from "../store/github";
-import { recordsSelector } from "../store/records";
+import { recordsLoadingSelector, recordsSelector } from "../store/records";
 import { Styles } from "./Styles";
+import { useCreateRefreshButton } from "../lib/useCreateRefreshButton";
 
 const panel = aha.getPanel(IDENTIFER, "workPanel", { name: "My Work" });
 
@@ -20,28 +27,14 @@ interface Props {
   visibleStatuses: string[];
 }
 
-const Spinner: React.FC<{}> = () => {
-  return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        width: "100%",
-        height: "100px",
-      }}
-    >
-      <aha-spinner size="48px" />
-    </div>
-  );
-};
-
 const MyWork: React.FC<Props> = ({ visibleStatuses }) => {
   const githubAuthState = useRecoilValueLoadable(authStateSelector);
   const [project] = useRecoilCachedLoadable(projectSelector, null);
   const [bookmark] = useRecoilCachedLoadable(bookmarkSelector, null);
   const [workflow] = useRecoilCachedLoadable(workflowSelector, null);
   const [records] = useRecoilCachedLoadable(recordsSelector, []);
+  const recordsLoading = useRecoilValue(recordsLoadingSelector);
+  const ref = useRef<HTMLDivElement>(null);
 
   const authorizeGithub = useRecoilCallback(
     ({ set }) =>
@@ -65,6 +58,8 @@ const MyWork: React.FC<Props> = ({ visibleStatuses }) => {
     }
   );
 
+  useCreateRefreshButton(ref.current, recordsLoading, incrementReload);
+
   if (!project) return <Spinner />;
   if (!project.isTeam) {
     return <div>Select a team first</div>;
@@ -72,7 +67,6 @@ const MyWork: React.FC<Props> = ({ visibleStatuses }) => {
   if (!bookmark || !workflow) return <Spinner />;
 
   const statuses = workflow.workflowStatuses.reduce((acc, status) => {
-    console.log({ visibleStatuses });
     if (visibleStatuses.length > 0 && !visibleStatuses.includes(status.name))
       return acc;
 
@@ -93,7 +87,7 @@ const MyWork: React.FC<Props> = ({ visibleStatuses }) => {
 
   return (
     <>
-      <div className="my-work">
+      <div className="my-work" ref={ref}>
         <div className="workflow-statuses">
           <aha-flex direction="column">{statuses}</aha-flex>
         </div>

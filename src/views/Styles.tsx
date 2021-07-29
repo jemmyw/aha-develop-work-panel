@@ -23,6 +23,7 @@ export const Styles = () => {
           font-size: 14px;
           display: flex;
           justify-content: space-between;
+          align-items: center;
         }
 
         .workflow-status > .title .name {

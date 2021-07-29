@@ -1,4 +1,4 @@
-import { selector, selectorFamily } from "recoil";
+import { noWait, selector, selectorFamily } from "recoil";
 import { bookmarkSelector } from "./bookmark";
 
 export const recordsSelector = selector<Aha.RecordUnion[]>({
@@ -13,10 +13,21 @@ export const recordsSelector = selector<Aha.RecordUnion[]>({
   },
 });
 
-export const recordSelector = selectorFamily<Aha.RecordUnion | undefined, string>({
+export const recordSelector = selectorFamily<
+  Aha.RecordUnion | undefined,
+  string
+>({
   key: "recordSelector",
   get:
     (id) =>
     ({ get }) =>
       get(recordsSelector).find((r) => r.id === id),
+});
+
+export const recordsLoadingSelector = selector({
+  key: "recordsLoadingSelector",
+  get: ({ get }) => {
+    const state = get(noWait(recordsSelector));
+    return state.state === "loading";
+  },
 });
