@@ -8,4 +8,4 @@ Add a condensed version of the workflow board to dashboard reports in Aha! devel
 
 **Note: In order to install an extension into your Aha! Develop account, you must be an account administrator.**
 
-Install the Work Panel extension by clicking [here](https://secure.aha.io/settings/account/extensions/install?url=).
+Install the Work Panel extension by clicking [here](https://secure.aha.io/settings/account/extensions/install?url=https://github.com/jemmyw/aha-develop-work-panel/releases/download/1.0.2/kealabs.work-panel-v1.0.2.gz).
