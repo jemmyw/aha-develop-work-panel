@@ -2,7 +2,7 @@
   
 Add a condensed version of the workflow board to dashboard reports in Aha! develop. Integrates with the github extension to display pull request info as well.
 
-![Screenshot_20210729_155843](https://user-images.githubusercontent.com/8016/127429341-cdb87186-0ed3-46cb-a839-ae0c4f0340df.png)
+![Screenshot_20210729_155843](https://user-images.githubusercontent.com/8016/127429341-cdb87186-0ed3-46cb-a839-ae0c4f0340df.png | width=200)
 
 ## Installing
 
