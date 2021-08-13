@@ -1,6 +1,8 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   RecoilRoot,
+  RecoilState,
+  RecoilValue,
   useRecoilCallback,
   useRecoilValue,
   useRecoilValueLoadable,
@@ -16,10 +18,15 @@ import {
   reactiveReloadId,
   workflowSelector,
 } from "../store/bookmark";
-import { authStateSelector, forceAuthState } from "../store/github";
+import {
+  authStateSelector,
+  forceAuthState,
+  githubLabelsState,
+} from "../store/github";
 import { recordsLoadingSelector, recordsSelector } from "../store/records";
 import { Styles } from "./Styles";
 import { useCreateRefreshButton } from "../lib/useCreateRefreshButton";
+import { PropsToState } from "../components/PropsToState";
 
 const panel = aha.getPanel(IDENTIFER, "workPanel", { name: "My Work" });
 
@@ -35,6 +42,7 @@ const MyWork: React.FC<Props> = ({ visibleStatuses }) => {
   const [records] = useRecoilCachedLoadable(recordsSelector, []);
   const recordsLoading = useRecoilValue(recordsLoadingSelector);
   const ref = useRef<HTMLDivElement>(null);
+  console.log(useRecoilValue(githubLabelsState));
 
   const authorizeGithub = useRecoilCallback(
     ({ set }) =>
@@ -108,15 +116,18 @@ panel.on("render", ({ props: { panel } }) => {
     .split(",")
     .map((s) => s.trim())
     .filter((s) => s.length > 0);
+  const githubLabels = ["true", true].includes(
+    panel.settings.githubLabels as any
+  );
 
   return (
     <>
       <Styles />
-      <RecoilRoot>
+      <PropsToState githubLabels={githubLabels}>
         <React.Suspense fallback={<Spinner />}>
           <MyWork visibleStatuses={visibleStatuses} />
         </React.Suspense>
-      </RecoilRoot>
+      </PropsToState>
     </>
   );
 });
@@ -127,6 +138,11 @@ panel.on({ action: "settings" }, () => {
       key: "visibleStatuses",
       type: "Text",
       title: "Visible statuses (comma separated)",
+    },
+    {
+      key: "githubLabels",
+      type: "Checkbox",
+      title: "Show GitHub labels",
     },
   ] as Aha.PanelSetting[];
 });

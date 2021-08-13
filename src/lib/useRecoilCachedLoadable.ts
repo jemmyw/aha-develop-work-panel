@@ -7,14 +7,14 @@ type CachedLoadableState = Loadable<any>["state"] | "hasCachedValue";
  * Use a recoil loadable that is cached in the component state. If the loadable
  * changes then the cached value will remain until the loadable finished loading
  * the next value, at which point the cached value will change.
- * 
+ *
  * Usage:
- * 
+ *
  * ```tsx
  * const MyComponent = () => {
  *   const [value, state] = useRecoilCachedLoadable(AsyncSelector);
  *   if(state === "loading") return <Spinner />
- *   
+ *
  *   return <div>{value}</div>;
  * }
  * ```
@@ -22,7 +22,7 @@ type CachedLoadableState = Loadable<any>["state"] | "hasCachedValue";
 export function useRecoilCachedLoadable<T>(
   recoilValue: RecoilValue<T>,
   initialValue: T
-): [T, CachedLoadableState] {
+): [T, CachedLoadableState, Loadable<T>] {
   const [cachedData, setCache] = useState<T>(initialValue);
   const loadable = useRecoilValueLoadable<T>(recoilValue);
 
@@ -38,5 +38,5 @@ export function useRecoilCachedLoadable<T>(
     state = "hasCachedValue";
   }
 
-  return [cachedData, state];
+  return [cachedData, state, loadable];
 }

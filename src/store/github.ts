@@ -6,6 +6,11 @@ import { recordsSelector } from "./records";
 
 type AuthState = "unknown" | "error" | "authing" | "authed";
 
+export const githubLabelsState = atom<boolean>({
+  key: "githubLabels",
+  default: false,
+});
+
 export const forceAuthState = atom<boolean>({
   key: "forceAuth",
   default: false,
@@ -75,12 +80,24 @@ const PrFragment = gql`
   }
 `;
 
+const LabelsFragment = gql`
+  fragment Labels on PullRequest {
+    labels(first: 5) {
+      nodes {
+        color
+        name
+      }
+    }
+  }
+`;
+
 const prQuery = (idx: number) =>
   gql`
   pr_idx: repository(owner: $owner_idx, name: $repo_idx) {
     pullRequest(number: $number_idx) {
       __typename
       ...Pr
+      ...Labels @include(if: $includeLabels)
     }
   }
 `.replaceAll("_idx", `_${idx}`);
@@ -88,10 +105,11 @@ const prQuery = (idx: number) =>
 export const githubPullRequestsSelector = selector({
   key: "githubPullRequests",
   get: async ({ get }) => {
+    const githubLabels = get(githubLabelsState);
     const authToken = get(authTokenSelector);
-    if (authToken === "") return {};
-
     const records = get(recordsSelector);
+
+    if (authToken === "") return {};
     if (records.length === 0) return {};
 
     const api = new Octokit({ auth: authToken });
@@ -134,13 +152,18 @@ export const githubPullRequestsSelector = selector({
     );
 
     const query =
-      "query GetPrs(" +
+      "query GetPrs($includeLabels: Boolean!, " +
       params.join(", ") +
       ") { " +
       queries.join("\n") +
       " }\n\n" +
-      PrFragment;
-    const result = (await api.graphql(query, variables)) as any;
+      PrFragment +
+      LabelsFragment;
+
+    const result = (await api.graphql(query, {
+      includeLabels: githubLabels,
+      ...variables,
+    })) as any;
 
     return Object.keys(result).reduce((acc, key) => {
       const url = result[key].pullRequest.url;
@@ -170,6 +193,7 @@ export interface GetPRPullRequest {
   number: number;
   state: "OPEN" | "MERGED" | "CLOSED";
   merged: boolean;
+  labels?: Labels;
   reviewDecision:
     | "REVIEW_REQUIRED"
     | "APPROVED"
@@ -193,4 +217,13 @@ export interface Commit {
 
 export interface StatusCheckRollup {
   state: "EXPECTED" | "ERROR" | "FAILURE" | "SUCCESS" | "PENDING";
+}
+
+export interface Labels {
+  nodes: Label[];
+}
+
+export interface Label {
+  color: string;
+  name: string;
 }

@@ -111,6 +111,31 @@ export const Styles = () => {
           color: #0b0b0b;
           background-color: #b8c0c9;
         }
+        .i-p.pr-l {
+          display: flex;
+        }
+        .i-p.pr-l > div {
+          border-radius: 2px;
+          padding: 1px 3px 0 3px;
+          overflow: hidden;
+          white-space: nowrap;
+          margin-left: -2px;
+          font-size: 0pt;
+          transition: width 0.2s, margin 0.2s, font-size 0.2s;
+        }
+        .i-p.pr-l > div:first-child {
+          margin-left: 0px;
+        }
+        .i-p.pr-l > div::first-letter {
+          font-size: 10px;
+        }
+        .i-p.pr-l:hover {
+          gap: 3px;
+        }
+        .i-p.pr-l:hover > div {
+          margin-left: 0;
+          font-size: 10px;
+        }
 
         .github-auth {
           position: absolute;
