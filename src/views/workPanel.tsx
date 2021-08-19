@@ -119,11 +119,12 @@ panel.on("render", ({ props: { panel } }) => {
   const githubLabels = ["true", true].includes(
     panel.settings.githubLabels as any
   );
+  const teamId = String(panel.settings.teamId || "");
 
   return (
     <>
       <Styles />
-      <PropsToState githubLabels={githubLabels}>
+      <PropsToState githubLabels={githubLabels} teamId={teamId}>
         <React.Suspense fallback={<Spinner />}>
           <MyWork visibleStatuses={visibleStatuses} />
         </React.Suspense>
@@ -134,6 +135,21 @@ panel.on("render", ({ props: { panel } }) => {
 
 panel.on({ action: "settings" }, () => {
   return [
+    {
+      key: "teamId",
+      type: "Select",
+      title: "Team",
+      options: async () => {
+        const projects = await aha.models.Project.select("id", "name", "isTeam")
+          .where({ teams: true })
+          .all();
+
+        return [
+          { text: "Currently selected", value: "0" },
+          ...projects.map((p) => ({ text: p.name, value: p.id })),
+        ];
+      },
+    },
     {
       key: "visibleStatuses",
       type: "Text",

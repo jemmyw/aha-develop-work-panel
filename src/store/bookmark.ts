@@ -5,13 +5,20 @@ export const reactiveReloadId = atom<number>({
   default: 0,
 });
 
+export const teamIdState = atom<string>({
+  key: "teamId",
+  default: "",
+});
+
 export const projectSelector = selector({
   key: "project",
   get: async ({ get }) => {
-    return await aha.models.Project.select("id", "name", "isTeam").find(
-      // @ts-ignore
-      window.currentProject.id
-    );
+    const selectedTeamId = get(teamIdState) || "";
+    // @ts-ignore
+    const teamId =
+      selectedTeamId === "" ? window.currentProject.id : selectedTeamId;
+
+    return await aha.models.Project.select("id", "name", "isTeam").find(teamId);
   },
 });
 
