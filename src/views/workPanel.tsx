@@ -42,7 +42,6 @@ const MyWork: React.FC<Props> = ({ visibleStatuses }) => {
   const [records] = useRecoilCachedLoadable(recordsSelector, []);
   const recordsLoading = useRecoilValue(recordsLoadingSelector);
   const ref = useRef<HTMLDivElement>(null);
-  console.log(useRecoilValue(githubLabelsState));
 
   const authorizeGithub = useRecoilCallback(
     ({ set }) =>

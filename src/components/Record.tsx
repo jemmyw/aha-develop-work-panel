@@ -1,22 +1,67 @@
-import React from "react";
+import Color from "color";
+import React, { useMemo, useState } from "react";
+import { useRecoilCachedLoadable } from "../lib/useRecoilCachedLoadable";
+import { featureRequirements } from "../store/requirements";
 import { GithubInfo } from "./github/GithubInfo";
+import { Requirement } from "./Requirement";
 
 export const Record: React.FC<{
-  workflowStatus: Aha.WorkflowStatus;
   record: Aha.RecordUnion;
 }> = ({ record }) => {
+  const [reqs] = useRecoilCachedLoadable(featureRequirements(record.id), []);
+
   const onClick: React.MouseEventHandler<HTMLAnchorElement> = (event) => {
     event.preventDefault();
     aha.drawer.showRecord(record);
   };
 
+  const requirementElements = useMemo(
+    () =>
+      reqs &&
+      reqs.map((req) => (
+        <Requirement key={`child-${req.id}`} requirement={req} />
+      )),
+    [reqs]
+  );
+
+  let color = null;
+  if (record.teamWorkflowStatus?.color) {
+    color = Color(record.teamWorkflowStatus.color).mix(
+      Color.rgb(255, 255, 255),
+      0.6
+    );
+  }
+
   return (
-    <div className="record">
-      <div className="ref">{record.referenceNum}</div>
-      <div className="name">
-        <a href="#" onClick={onClick}>
-          {record.name}
-        </a>
+    <div
+      className="record"
+      style={
+        color
+          ? {
+              borderLeft: `5px solid ${color.hex()}`,
+            }
+          : {}
+      }
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <div>
+          <div className="ref">
+            <a href="#" onClick={onClick}>
+              {record.referenceNum}
+            </a>
+          </div>
+          <div className="name">
+            <a href="#" onClick={onClick}>
+              {record.name}
+            </a>
+          </div>
+        </div>
       </div>
       <div className="info">
         <div
@@ -36,6 +81,9 @@ export const Record: React.FC<{
         )}
         <GithubInfo fields={record.extensionFields} />
       </div>
+      {requirementElements && requirementElements.length > 0 && (
+        <div className="requirements">{requirementElements}</div>
+      )}
     </div>
   );
 };

@@ -1,5 +1,12 @@
 import { atom, selector } from "recoil";
 
+export const githubExtensionFieldScope = aha.models.ExtensionField.select(
+  "name",
+  "value"
+).where({
+  extensionIdentifier: "aha-develop.github",
+});
+
 export const reactiveReloadId = atom<number>({
   key: "reactiveReloadId",
   default: 0,
@@ -14,8 +21,7 @@ export const projectSelector = selector({
   key: "project",
   get: async ({ get }) => {
     const selectedTeamId = get(teamIdState) || "";
-    // @ts-ignore
-    const teamId =
+    const teamId = // @ts-ignore
       selectedTeamId === "" ? window.currentProject.id : selectedTeamId;
 
     return await aha.models.Project.select("id", "name", "isTeam").find(teamId);
@@ -37,12 +43,7 @@ export const bookmarkSelector = selector({
         .buildRecordScope(objectClass)
         .merge({
           originalEstimate: ["text"],
-          extensionFields: aha.models.ExtensionField.select(
-            "name",
-            "value"
-          ).where({
-            extensionIdentifier: "aha-develop.github",
-          }),
+          extensionFields: githubExtensionFieldScope,
         })
     ).reduce((acc: Aha.Query<any, any>, scope: Aha.Query<any, any>) =>
       acc.union(scope)

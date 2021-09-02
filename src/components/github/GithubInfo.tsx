@@ -1,11 +1,14 @@
 import React from "react";
 import { useRecoilCachedLoadable } from "../../lib/useRecoilCachedLoadable";
 import { PrInfo } from "../../PrInfo";
-import { githubPullRequestSelector, Labels } from "../../store/github";
+import {
+  GetPRPullRequest,
+  githubPullRequestSelector
+} from "../../store/github";
 import { mapStatusCheck } from "../../store/helpers/mapStatusCheck";
+import { Labels } from "./Labels";
 import { ReviewDecision } from "./ReviewDecision";
 import { StatusCheck } from "./StatusCheck";
-import Color from "color";
 
 const PrState: React.FC<{ state: PrInfo["state"] }> = ({ state }) => {
   return (
@@ -15,73 +18,76 @@ const PrState: React.FC<{ state: PrInfo["state"] }> = ({ state }) => {
   );
 };
 
-const Labels: React.FC<{ labels: Labels }> = ({ labels }) => {
-  const labelEls = labels.nodes.map((label, i) => {
-    const color = Color("#" + label.color);
-
-    return (
-      <div
-        className="pr-label"
-        style={{
-          backgroundColor: color.hex(),
-          color: color.isDark() ? "white" : "black",
-        }}
-        key={i}
-      >
-        {label.name}
+const PartialPullRequestInfo: React.FC<{ prInfo: PrInfo }> = ({ prInfo }) => {
+  return (
+    <>
+      <div className={"i-p pr-n " + prInfo.state.toLowerCase()}>
+        <a href={aha.sanitizeUrl(prInfo.url)} target="_blank">
+          #{prInfo.id}
+        </a>
       </div>
-    );
-  });
-
-  return <div className="i-p pr-l">{labelEls}</div>;
+      <PrState state={prInfo.state} />
+    </>
+  );
 };
 
-const PullRequestInfo: React.FC<{ prInfo: PrInfo }> = ({ prInfo }) => {
+const FullPullRequestInfo: React.FC<{ prInfo: GetPRPullRequest }> = ({
+  prInfo,
+}) => {
+  const check = mapStatusCheck(prInfo);
+
+  return (
+    <>
+      <div className={"i-p pr-n " + prInfo.state.toLowerCase()}>
+        <a href={aha.sanitizeUrl(prInfo.url)} target="_blank">
+          #{prInfo.number}
+        </a>
+      </div>
+      <PrState state={prInfo.state} />
+      {check && <StatusCheck check={check} />}
+      {prInfo.reviewDecision && (
+        <ReviewDecision reviewDecision={prInfo.reviewDecision} />
+      )}
+      {prInfo.labels && <Labels labels={prInfo.labels} />}
+    </>
+  );
+};
+
+const PullRequestInfo: React.FC<{
+  prInfo: PrInfo;
+  FullComponent: React.ComponentType<{ prInfo: GetPRPullRequest }>;
+  PartialComponent: React.ComponentType<{ prInfo: PrInfo }>;
+}> = ({ prInfo, FullComponent, PartialComponent }) => {
   const [fullPrInfo, state] = useRecoilCachedLoadable(
     githubPullRequestSelector(prInfo.url),
     null
   );
 
-  if (!fullPrInfo) {
-    return (
-      <>
-        <div className={"i-p pr-n " + prInfo.state.toLowerCase()}>
-          <a href={aha.sanitizeUrl(prInfo.url)} target="_blank">
-            #{prInfo.id}
-          </a>
-        </div>
-        <PrState state={prInfo.state} />
-      </>
-    );
+  if (fullPrInfo) {
+    return <FullComponent prInfo={fullPrInfo} />;
   }
 
-  const check = mapStatusCheck(fullPrInfo);
-
-  return (
-    <>
-      <div className={"i-p pr-n " + fullPrInfo.state.toLowerCase()}>
-        <a href={aha.sanitizeUrl(prInfo.url)} target="_blank">
-          #{prInfo.id}
-        </a>
-      </div>
-      <PrState state={fullPrInfo.state} />
-      {check && <StatusCheck check={check} />}
-      {fullPrInfo.reviewDecision && (
-        <ReviewDecision reviewDecision={fullPrInfo.reviewDecision} />
-      )}
-      {fullPrInfo.labels && <Labels labels={fullPrInfo.labels} />}
-    </>
-  );
+  return <PartialComponent prInfo={prInfo} />;
 };
 
-export const GithubInfo: React.FC<{ fields: Aha.ExtensionField[] }> = ({
+export const GithubInfo: React.FC<{
+  fields: Aha.ExtensionField[];
+  FullComponent?: React.ComponentType<{ prInfo: GetPRPullRequest }>;
+  PartialComponent?: React.ComponentType<{ prInfo: PrInfo }>;
+}> = ({
   fields,
+  FullComponent = FullPullRequestInfo,
+  PartialComponent = PartialPullRequestInfo,
 }) => {
   const prs = fields
     .filter((f) => f.name === "pullRequests")
     .flatMap((prFields) =>
       prFields.value.map((prInfo: PrInfo) => (
-        <PullRequestInfo prInfo={prInfo} />
+        <PullRequestInfo
+          prInfo={prInfo}
+          FullComponent={FullComponent}
+          PartialComponent={PartialComponent}
+        />
       ))
     );
 

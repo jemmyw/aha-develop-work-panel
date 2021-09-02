@@ -16,7 +16,7 @@ export const WorkflowStatus: React.FC<Props> = ({
   const back = color.mix(Color.rgb(255, 255, 255), 0.6);
 
   const recordElements = records.map((record) => (
-    <Record workflowStatus={workflowStatus} record={record} key={record.id} />
+    <Record record={record} key={record.id} />
   ));
 
   return (

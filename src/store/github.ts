@@ -2,7 +2,9 @@ import { Octokit } from "@octokit/rest";
 import gql from "gql-tag";
 import { atom, noWait, selector, selectorFamily } from "recoil";
 import { PrInfo } from "../PrInfo";
+import { reactiveReloadId } from "./bookmark";
 import { recordsSelector } from "./records";
+import { requirementsSelector } from "./requirements";
 
 type AuthState = "unknown" | "error" | "authing" | "authed";
 
@@ -102,28 +104,33 @@ const prQuery = (idx: number) =>
   }
 `.replaceAll("_idx", `_${idx}`);
 
+const recordPrInfo = (record: Aha.RecordUnion) =>
+  (record.extensionFields.find((f) => f.name === "pullRequests")
+    ?.value as PrInfo[]) || [];
+
 export const githubPullRequestsSelector = selector({
   key: "githubPullRequests",
   get: async ({ get }) => {
     const githubLabels = get(githubLabelsState);
     const authToken = get(authTokenSelector);
     const records = get(recordsSelector);
+    const requirements = get(noWait(requirementsSelector)).valueMaybe() || {};
 
     if (authToken === "") return {};
-    if (records.length === 0) return {};
 
     const api = new Octokit({ auth: authToken });
     const prInfo = [
       ...new Set(
-        records
-          .flatMap(
-            (r) =>
-              (r.extensionFields.find((f) => f.name === "pullRequests")
-                ?.value as PrInfo[]) || []
-          )
-          .map((p) => p.url)
+        [
+          ...records.flatMap(recordPrInfo),
+          ...Object.values(requirements).flatMap((rs) =>
+            rs.flatMap(recordPrInfo)
+          ),
+        ].map((p) => p.url)
       ),
     ];
+
+    if (prInfo.length === 0) return {};
 
     const [queries, variables, params] = prInfo.reduce(
       (acc, url, idx) => {
@@ -173,10 +180,11 @@ export const githubPullRequestsSelector = selector({
       };
     }, {} as { [key: string]: GetPRPullRequest });
   },
+  dangerouslyAllowMutability: true,
 });
 
 export const githubPullRequestSelector = selectorFamily<
-  GetPRPullRequest,
+  GetPRPullRequest | undefined,
   string
 >({
   key: "githubPullRequest",

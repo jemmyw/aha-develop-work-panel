@@ -54,6 +54,10 @@ export const Styles = () => {
           border-bottom: 1px solid var(--aha-gray-400);
         }
 
+        .record-expand {
+          color: var(--theme-secondary-text);
+        }
+
         .record .info {
           display: flex;
           align-items: "center";
@@ -135,6 +139,42 @@ export const Styles = () => {
         .i-p.pr-l:hover > div {
           margin-left: 0;
           font-size: 10px;
+        }
+
+        .requirements {
+          padding: 5px 0 5px 10px;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+
+        .requirement {
+          display: flex;
+          gap: 5px;
+        }
+
+        .requirement-status {
+          padding-top: 2px;
+          font-size: 9px;
+        }
+
+        .requirement-ref {
+          white-space: nowrap;
+        }
+
+        .requirement-name {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .requirement-github {
+          display: flex;
+          font-size: 90%;
+        }
+
+        .requirement-github .i-p {
+          padding: 0 2px;
         }
 
         .github-auth {
