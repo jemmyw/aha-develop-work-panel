@@ -24,7 +24,9 @@ export const projectSelector = selector({
     const teamId = // @ts-ignore
       selectedTeamId === "" ? window.currentProject.id : selectedTeamId;
 
-    return await aha.models.Project.select("id", "name", "isTeam").find(teamId);
+    return await aha.models.Project.select("id", "name", "isTeam")
+      .merge({ workflowBoardBookmark: ["id", "view"] })
+      .find(teamId);
   },
 });
 
@@ -36,6 +38,12 @@ export const bookmarkSelector = selector({
     const project = get(projectSelector);
     if (!project?.isTeam) return null;
 
+    const setupBookmark = project.workflowBoardBookmark;
+    if (setupBookmark.view !== "my_work") {
+      setupBookmark.view = "my_work";
+      await setupBookmark.save();
+    }
+
     const scopes = (
       aha.models.BookmarksWorkflowBoard as any
     ).OBJECT_CLASSES.map((objectClass: any) =>
@@ -45,9 +53,11 @@ export const bookmarkSelector = selector({
           originalEstimate: ["text"],
           extensionFields: githubExtensionFieldScope,
         })
-    ).reduce((acc: Aha.Query<any, any>, scope: Aha.Query<any, any>) =>
-      acc.union(scope)
-    ) as Aha.Query<any, any>;
+    )
+      .reduce((acc: Aha.Query<any, any>, scope: Aha.Query<any, any>) =>
+        acc.union(scope)
+      )
+      .where({ active: true }) as Aha.Query<any, any>;
 
     const bookmarkScope = aha.models.BookmarksWorkflowBoard.select(
       "id",
@@ -63,13 +73,7 @@ export const bookmarkSelector = selector({
       }),
     });
 
-    const bookmarkProject = await aha.models.Project.select("id", "name")
-      .merge({ workflowBoardBookmark: bookmarkScope })
-      .find(project.id);
-
-    const bookmark = new aha.models.BookmarksWorkflowBoard(
-      bookmarkProject.attributes.workflowBoardBookmark
-    ) as Aha.BookmarksWorkflowBoard;
+    const bookmark = await bookmarkScope.find(setupBookmark.id);
     return bookmark;
   },
 });
