@@ -2,7 +2,6 @@ import { Octokit } from "@octokit/rest";
 import gql from "gql-tag";
 import { atom, noWait, selector, selectorFamily } from "recoil";
 import { PrInfo } from "../PrInfo";
-import { reactiveReloadId } from "./bookmark";
 import { recordsSelector } from "./records";
 import { requirementsSelector } from "./requirements";
 

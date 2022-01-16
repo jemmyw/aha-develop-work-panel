@@ -7,11 +7,6 @@ export const githubExtensionFieldScope = aha.models.ExtensionField.select(
   extensionIdentifier: "aha-develop.github",
 });
 
-export const reactiveReloadId = atom<number>({
-  key: "reactiveReloadId",
-  default: 0,
-});
-
 export const teamIdState = atom<string>({
   key: "teamId",
   default: "",
@@ -33,8 +28,6 @@ export const projectSelector = selector({
 export const bookmarkSelector = selector({
   key: "bookmark",
   get: async ({ get }) => {
-    // Trigger when the reactive reload id changes
-    get(reactiveReloadId);
     const project = get(projectSelector);
     if (!project?.isTeam) return null;
 

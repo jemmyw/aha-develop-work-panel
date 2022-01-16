@@ -13,7 +13,8 @@
     "@types/color": "^3.0.2",
     "@types/jquery": "^3.5.6",
     "@types/react": "^17.0.14",
-    "@types/uuid": "^8.3.1"
+    "@types/uuid": "^8.3.1",
+    "prettier": "^2.5.1"
   },
   "ahaExtension": {
     "cspSources": [

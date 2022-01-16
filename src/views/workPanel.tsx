@@ -1,32 +1,25 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import {
-  RecoilRoot,
-  RecoilState,
-  RecoilValue,
   useRecoilCallback,
+  useRecoilRefresher_UNSTABLE,
   useRecoilValue,
   useRecoilValueLoadable,
 } from "recoil";
+import { PropsToState } from "../components/PropsToState";
 import { Spinner } from "../components/Spinner";
 import { WorkflowStatus } from "../components/WorkflowStatus";
 import { IDENTIFER } from "../identifier";
+import { useCreateRefreshButton } from "../lib/useCreateRefreshButton";
 import { useReactiveRegister } from "../lib/useReactiveRegister";
 import { useRecoilCachedLoadable } from "../lib/useRecoilCachedLoadable";
 import {
   bookmarkSelector,
   projectSelector,
-  reactiveReloadId,
   workflowSelector,
 } from "../store/bookmark";
-import {
-  authStateSelector,
-  forceAuthState,
-  githubLabelsState,
-} from "../store/github";
+import { authStateSelector, forceAuthState } from "../store/github";
 import { recordsLoadingSelector, recordsSelector } from "../store/records";
 import { Styles } from "./Styles";
-import { useCreateRefreshButton } from "../lib/useCreateRefreshButton";
-import { PropsToState } from "../components/PropsToState";
 
 const panel = aha.getPanel(IDENTIFER, "workPanel", { name: "My Work" });
 
@@ -40,6 +33,7 @@ const MyWork: React.FC<Props> = ({ visibleStatuses }) => {
   const [bookmark] = useRecoilCachedLoadable(bookmarkSelector, null);
   const [workflow] = useRecoilCachedLoadable(workflowSelector, null);
   const [records] = useRecoilCachedLoadable(recordsSelector, []);
+  const refresh = useRecoilRefresher_UNSTABLE(recordsSelector);
   const recordsLoading = useRecoilValue(recordsLoadingSelector);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -49,23 +43,19 @@ const MyWork: React.FC<Props> = ({ visibleStatuses }) => {
         set(forceAuthState, true)
   );
 
-  const incrementReload = useRecoilCallback(({ set }) => () => {
-    set(reactiveReloadId, (id) => id + 1);
-  });
-
-  const reactiveReloadTimer = useRef<NodeJS.Timeout>();
+  const reactiveReloadTimer = useRef<number>();
   useReactiveRegister(
     records.map(({ id, typename }) => `${typename}-${id}`),
     () => {
       if (reactiveReloadTimer.current) return;
       reactiveReloadTimer.current = setTimeout(() => {
-        incrementReload();
+        refresh();
         reactiveReloadTimer.current = undefined;
       }, 250);
     }
   );
 
-  useCreateRefreshButton(ref.current, recordsLoading, incrementReload);
+  useCreateRefreshButton(ref.current, recordsLoading, () => refresh());
 
   if (!project) return <Spinner />;
   if (!project.isTeam) {
