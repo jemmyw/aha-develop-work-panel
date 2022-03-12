@@ -12,7 +12,7 @@ const checkStyle = (status: StatusCheckRollup["state"]) => {
     case "PENDING":
       return { color: "yellow", icon: "fa-clock" };
     case "SUCCESS":
-      return { color: "green", icon: "fa-check-circle" };
+      return { color: "var(--green)", icon: "fa-check-circle" };
   }
 };
 export const StatusCheck: React.FC<{ check: StatusCheckRollup }> = ({

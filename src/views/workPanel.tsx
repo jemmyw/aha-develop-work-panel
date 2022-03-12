@@ -1,7 +1,8 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   useRecoilCallback,
   useRecoilRefresher_UNSTABLE,
+  useRecoilState,
   useRecoilValue,
   useRecoilValueLoadable,
 } from "recoil";
@@ -19,6 +20,7 @@ import {
 } from "../store/bookmark";
 import { authStateSelector, forceAuthState } from "../store/github";
 import { recordsLoadingSelector, recordsSelector } from "../store/records";
+import { themeState } from "../store/theme";
 import { Styles } from "./Styles";
 
 const panel = aha.getPanel(IDENTIFER, "workPanel", { name: "My Work" });
@@ -36,6 +38,16 @@ const MyWork: React.FC<Props> = ({ visibleStatuses }) => {
   const refresh = useRecoilRefresher_UNSTABLE(recordsSelector);
   const recordsLoading = useRecoilValue(recordsLoadingSelector);
   const ref = useRef<HTMLDivElement>(null);
+  const [theme, setTheme] = useRecoilState(themeState);
+
+  useEffect(() => {
+    const m = new MutationObserver(() => {
+      setTheme(window.themeStore.theme);
+    });
+    m.observe(document.body, { attributeFilter: ["data-theme"] });
+
+    return () => m.disconnect();
+  }, []);
 
   const authorizeGithub = useRecoilCallback(
     ({ set }) =>
@@ -84,7 +96,7 @@ const MyWork: React.FC<Props> = ({ visibleStatuses }) => {
 
   return (
     <>
-      <div className="my-work" ref={ref}>
+      <div className={`my-work ${theme}`} ref={ref}>
         <div className="workflow-statuses">
           <aha-flex direction="column">{statuses}</aha-flex>
         </div>

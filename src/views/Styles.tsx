@@ -18,6 +18,15 @@ export const Styles = () => {
   return (
     <style>
       {css`
+        .light {
+          --green: green;
+        }
+        .dark { --green: rgb(100,255,50); }
+
+        a {
+          color: var(--theme-link-text);
+        }
+
         .workflow-status > .title {
           padding: 3px 8px;
           font-size: 14px;
@@ -49,7 +58,7 @@ export const Styles = () => {
         }
 
         .record {
-          background-color: white;
+          background-color: var(--theme-primary-background);
           padding: 0;
           border-bottom: 1px solid var(--aha-gray-400);
         }
@@ -61,10 +70,10 @@ export const Styles = () => {
         .record .info {
           display: flex;
           align-items: "center";
-          color: var(--aha-gray-800);
-          background-color: var(--aha-gray-200);
-          border-top: 1px solid var(--aha-gray-400);
-          border-bottom: 1px solid white;
+          color: var(--theme-tertiary-text);
+          background-color: var(--theme-tertiary-background);
+          border-top: 1px solid var(--theme-secondary-border);
+          border-bottom: 1px solid var(--theme-primary-background);
           font-size: 10px;
         }
 
@@ -76,13 +85,16 @@ export const Styles = () => {
           display: flex;
           align-items: center;
           border: 1px solid rgba(0, 0, 0, 0);
-          border-left: 1px solid white;
-          border-right: 1px solid var(--aha-gray-400);
+          border-left: 1px solid var(--theme-primary-background);
+          border-right: 1px solid var(--theme-secondary-border);
           padding: 1px 3px 0 3px;
         }
 
         .i-p.commentCount {
           color: var(--aha-gray-600);
+        }
+        .dark .i-p.commentCount {
+          color: var(--aha-gray-500);
         }
         .i-p.commentCount aha-icon,
         .i-p.estimate aha-icon {
@@ -90,6 +102,9 @@ export const Styles = () => {
         }
         .i-p.commentCount.hasComments {
           color: var(--aha-gray-800);
+        }
+        .dark .i-p.commentCount.hasComments {
+          color: var(--aha-gray-200);
         }
 
         .i-p.pr-s {
@@ -140,6 +155,26 @@ export const Styles = () => {
           margin-left: 0;
           font-size: 10px;
         }
+
+        .i-p.pr-r.approved {
+          color: var(--green);
+        }
+        .i-p.pr-r.changes_requested {
+          color: yellow;
+        }
+        .i-p.pr-r.commented {
+          color: var(--aha-gray-800);
+        }
+        .dark .i-p.pr-r.commented {
+          color: var(--aha-gray-300);
+        }
+        .i-p.pr-r.review_required {
+          color: var(--aha-gray-800);
+        }
+        .dark .i-p.pr-r.review_required {
+          color: var(--aha-gray-300);
+        }
+
 
         .requirements {
           padding: 5px 0 5px 10px;

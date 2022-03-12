@@ -38,7 +38,7 @@
     "@aha-app/aha-develop-react": "^1.0.6",
     "@octokit/graphql": "^4.6.4",
     "@octokit/rest": "^18.7.0",
-    "color": "^4.0.0",
+    "color": "^4.2.0",
     "gql-tag": "^1.0.1",
     "recoil": "0.5.2",
     "uuid": "^8.3.2"
