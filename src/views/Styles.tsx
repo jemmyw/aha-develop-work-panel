@@ -60,7 +60,7 @@ export const Styles = () => {
         .record {
           background-color: var(--theme-primary-background);
           padding: 0;
-          border-bottom: 1px solid var(--aha-gray-400);
+          border-bottom: 1px solid var(--theme-primary-border);
         }
 
         .record-expand {

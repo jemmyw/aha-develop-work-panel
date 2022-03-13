@@ -16,7 +16,7 @@ export const WorkflowStatus: React.FC<Props> = ({
   const theme = useRecoilValue(themeState);
   const color = Color(workflowStatus.color);
   const mix =
-    theme === "dark" ? Color.rgb(50, 50, 50) : Color.rgb(255, 255, 255);
+    theme === "dark" ? Color.rgb(40, 40, 40) : Color.rgb(255, 255, 255);
   const back = color.mix(mix, 0.4);
   const fore = back.isDark() ? "#fff" : "#000";
   const listBack = color.mix(mix, 0.6);
